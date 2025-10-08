@@ -222,14 +222,15 @@ function drawWheel() {
     ctx.save();
     ctx.translate(radius, radius);
     ctx.rotate(angle + arcSize / 2);
-    ctx.textAlign = "right";
-    ctx.textBaseline = "middle"; // Vertikal di tengah slice
+    ctx.textAlign = "center";      // horizontal center di slice
+    ctx.textBaseline = "middle";   // vertical center
     ctx.fillStyle = "white";
 
-    let fontSize = radius / 10; // sebelumnya radius/8 → bisa coba radius/10
-ctx.font = `bold ${fontSize}px Arial`;
-const textRadius = radius * 0.7; 
-    ctx.fillText(prizes[i].name, textRadius, 0);
+    let fontSize = radius / 8;     // sesuaikan ukuran teks dengan radius
+    ctx.font = `bold ${fontSize}px Arial`;
+
+    const textRadius = radius * 0.6; // jarak dari pusat ke posisi teks
+    ctx.fillText(prizes[i].name, 0, -textRadius); // posisi teks di slice
     ctx.restore();
   }
 }
@@ -323,6 +324,7 @@ updateStockList();
 </script>
 </body>
 </html>
+
 
 
 
