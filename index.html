@@ -224,10 +224,16 @@ function drawWheel() {
     ctx.translate(radius, radius);
     ctx.rotate(angle + arcSize / 2);
     ctx.textAlign = "right";
+    ctx.textBaseline = "middle"; // Vertikal di tengah slice
     ctx.fillStyle = "white";
-    let fontSize = radius / 8;
+
+    // font size proporsional dengan radius
+    let fontSize = radius / 6; 
     ctx.font = `bold ${fontSize}px Arial`;
-    ctx.fillText(prizes[i].name, radius * 0.85, 5);
+
+    // posisi teks proporsional
+    ctx.fillText(prizes[i].name, radius * 0.85, 0);
+
     ctx.restore();
   }
 }
@@ -321,6 +327,7 @@ updateStockList();
 </script>
 </body>
 </html>
+
 
 
 
