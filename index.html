@@ -206,15 +206,12 @@ function resizeCanvas() {
 
 function drawWheel() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
   const colors = ['#2332EB', '#9EB2DB', '#4E6EF2'];
   const radius = canvas.width / 2;
   const arcSize = (2 * Math.PI) / totalSlices;
 
   for (let i = 0; i < totalSlices; i++) {
     const angle = i * arcSize;
-
-    // Warna slice
     ctx.fillStyle = colors[i % 3];
     ctx.beginPath();
     ctx.moveTo(radius, radius);
@@ -222,19 +219,19 @@ function drawWheel() {
     ctx.closePath();
     ctx.fill();
 
-    // ===== TEKS =====
+    // gambar teks
     ctx.save();
-    ctx.translate(radius, radius);       // pindah ke tengah wheel
-    ctx.rotate(angle + arcSize / 2);     // rotasi ke tengah slice
-    ctx.textAlign = "center";            // horizontal di tengah slice
-    ctx.textBaseline = "middle";         // vertikal di tengah slice
+    ctx.translate(radius, radius);
+    ctx.rotate(angle + arcSize / 2);
     ctx.fillStyle = "white";
-
-    let fontSize = radius / 10;          // font proporsional
+    ctx.textAlign = "right";
+    
+    let fontSize = radius / 10; // proporsional dengan radius
     ctx.font = `bold ${fontSize}px Arial`;
 
-    const textRadius = radius * 0.6;     // jarak teks dari pusat
-    ctx.fillText(prizes[i].name, 0, -textRadius);
+    // posisikan teks menjauh dari pusat, misal 70% dari radius
+    const textRadius = radius * 0.7; 
+    ctx.fillText(prizes[i].name, textRadius, 0);
     ctx.restore();
   }
 }
@@ -328,6 +325,7 @@ updateStockList();
 </script>
 </body>
 </html>
+
 
 
 
