@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Spin Hadiah Booth</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: url('poster.jpg') no-repeat center top;
+    background-size: cover;
+    background-attachment: scroll;
+    font-family: Arial, sans-serif;
+    color: white;
+    text-shadow: 1px 1px 4px black;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* HEADER */
+  header {
+    text-align: center;
+    padding-top: 20px;
+  }
+  header h1 { font-size: 1.8em; margin: 0; font-weight: bold; }
+  header h2 { font-size: 1.1em; margin: 5px 0 0 0; font-weight: normal; }
+
+  /* RODA SPIN */
+  #wheelContainer {
+    position: relative;
+    width: 80vw;
+    max-width: 380px;
+    aspect-ratio: 1/1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 25px;
+  }
+  #wheel {
+    width: 95%;
+    height: 95%;
+    border-radius: 50%;
+    border: 6px solid white;
+    position: relative;
+    transition: transform 4s cubic-bezier(0.33, 1, 0.68, 1);
+    background: rgba(0,0,0,0.1);
+  }
+  #wheelCanvas { width: 100%; height: 100%; }
+  #arrow {
+    width: 0; height: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-bottom: 40px solid red;
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+  }
+
+  /* Tombol */
+  #spinBtn, #resetBtn {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding: 15px 25px;
+    background: red;
+    color: white;
+    border: none;
+    font-size: 20px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  #resetBtn {
+    background: rgba(0,0,0,0.6);
+    font-size: 14px;
+    border: 1px solid white;
+  }
+
+  /* LOGO AREA */
+  #logoArea {
+    margin-top: 20px;
+    text-align: center;
+  }
+  .logoContainer {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .logoContainer img {
+    height: 40px;
+    max-width: 90px;
+    object-fit: contain;
+  }
+  #eventText {
+    font-size: 1em;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  /* STOCK LIST */
+  #stockList {
+    margin-top: 15px;
+    background: rgba(0,0,0,0.5);
+    padding: 10px 15px;
+    border-radius: 10px;
+    font-size: 16px;
+    max-height: 180px;
+    overflow-y: auto;
+    width: 90%;
+    max-width: 400px;
+  }
+  #stockList ul { list-style: none; padding: 0; margin: 0; }
+  #stockList li {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+  }
+
+  /* POPUP */
+  #popup {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    z-index: 1000;
+    color: white;
+    text-align: center;
+  }
+  #popup h1 { font-size: 2.5em; margin-bottom: 20px; }
+  #doneBtn {
+    padding: 10px 20px;
+    font-size: 18px;
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <header>
+    <h1>TORAJA ROADSTER</h1>
+    <h2>DeVilbiss Giveaway</h2>
+  </header>
+
+  <div id="wheelContainer">
+    <div id="arrow"></div>
+    <div id="wheel">
+      <canvas id="wheelCanvas" width="320" height="320"></canvas>
+    </div>
+  </div>
+
+  <button id="spinBtn">🎯 SPIN SEKARANG</button>
+
+  <!-- LOGO AREA -->
+    <div id="eventText">
+      <div>IMX 2025</div>
+      <div>10–12 October</div>
+    </div>
+  </div>
+  <div id="logoArea">
+    <div class="logoContainer">
+      <img src="logo1.png" alt="logo 1">
+      <img src="logo2.png" alt="logo 2">
+      <img src="logo3.png" alt="logo 3">
+      <img src="logo4.png" alt="logo 4">
+    </div>
+
+  <button id="resetBtn">🔄 Reset Stok Hadiah</button>
+  <!-- Daftar stok -->
+  <div id="stockList">
+    <ul id="stockUl"></ul>
+  </div>
+
+  <!-- Popup -->
+  <div id="popup">
+    <h1 id="popupText"></h1>
+    <button id="doneBtn">Selesai</button>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script>
+  const defaultPrizes = [
+    { name: "Sticker", stock: 7 },
+    { name: "Pulpen", stock: 16 },
+    { name: "Topi", stock: 2 },
+    { name: "Kaos Toraja Roadster", stock: 1 },
+    { name: "PhotoCard", stock: 1 },
+    { name: "Kaos ESA + Devilbiss", stock: 1 },
+    { name: "Flash Disc", stock: 4 },
+    { name: "Voucher Tokped Disc 10%", stock: 3 },
+    { name: "Voucher Tokped Disc 20%", stock: 3 },
+  ];
+
+  let prizes = [];
+  const wheel = document.getElementById("wheel");
+  const canvas = document.getElementById("wheelCanvas");
+  const ctx = canvas.getContext("2d");
+  const spinBtn = document.getElementById("spinBtn");
+  const resetBtn = document.getElementById("resetBtn");
+  const stockUl = document.getElementById("stockUl");
+  const popup = document.getElementById("popup");
+  const popupText = document.getElementById("popupText");
+  const doneBtn = document.getElementById("doneBtn");
+
+  const totalSlices = defaultPrizes.length;
+  const arcSize = (2 * Math.PI) / totalSlices;
+  let currentRotation = 0;
+  let isSpinning = false;
+
+  function loadPrizes() {
+    const saved = localStorage.getItem("spinPrizes");
+    prizes = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultPrizes));
+  }
+  function savePrizes() { localStorage.setItem("spinPrizes", JSON.stringify(prizes)); }
+
+  function drawWheel() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < totalSlices; i++) {
+      const angle = i * arcSize;
+      ctx.fillStyle = i % 2 === 0 ? '#ff6600' : '#ffaa00';
+      ctx.beginPath();
+      ctx.moveTo(160, 160);
+      ctx.arc(160, 160, 160, angle, angle + arcSize);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.save();
+      ctx.translate(160, 160);
+      ctx.rotate(angle + arcSize / 2);
+      ctx.textAlign = "right";
+      ctx.fillStyle = "white";
+      ctx.font = "bold 13px Arial";
+      ctx.fillText(prizes[i].name, 140, 5);
+      ctx.restore();
+    }
+  }
+
+  function updateStockList() {
+    stockUl.innerHTML = "";
+    prizes.forEach(p => {
+      const li = document.createElement("li");
+      li.innerHTML = `<span>${p.name}</span><span>${p.stock}</span>`;
+      stockUl.appendChild(li);
+    });
+  }
+
+  function pickPrize() {
+    let totalStock = prizes.reduce((sum, p) => sum + p.stock, 0);
+    let r = Math.random() * totalStock;
+    let acc = 0;
+    for (let p of prizes) {
+      acc += p.stock;
+      if (r <= acc) return p;
+    }
+  }
+
+  function showPopup(prize) {
+    popupText.textContent = `🎉 Kamu dapat: ${prize}`;
+    popup.style.display = "flex";
+    confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
+  }
+  doneBtn.addEventListener("click", () => popup.style.display = "none");
+
+  spinBtn.addEventListener("click", () => {
+    if (isSpinning) return;
+    const available = prizes.filter(p => p.stock > 0);
+    if (available.length === 0) {
+      showPopup("🎁 Stok hadiah sudah habis!");
+      return;
+    }
+
+    isSpinning = true;
+    let selectedPrize = pickPrize();
+    if (!selectedPrize || selectedPrize.stock === 0) {
+      selectedPrize = available[Math.floor(Math.random() * available.length)];
+    }
+
+    const prizeIndex = prizes.indexOf(selectedPrize);
+    const sliceAngle = 360 / totalSlices;
+    const randomSpin = (360 * 5) + (360 - (prizeIndex * sliceAngle + sliceAngle / 2));
+    const finalRotation = currentRotation + randomSpin;
+
+    wheel.style.transition = 'transform 4s cubic-bezier(0.33, 1, 0.68, 1)';
+    wheel.style.transform = `rotate(${finalRotation}deg)`;
+
+    wheel.addEventListener('transitionend', () => {
+      currentRotation = finalRotation % 360;
+      wheel.style.transition = 'none';
+      wheel.style.transform = `rotate(${currentRotation}deg)`;
+      selectedPrize.stock--;
+      savePrizes();
+      updateStockList();
+      showPopup(selectedPrize.name);
+      isSpinning = false;
+    }, { once: true });
+  });
+
+  resetBtn.addEventListener("click", () => {
+    if (confirm("Yakin ingin reset stok hadiah ke default?")) {
+      prizes = JSON.parse(JSON.stringify(defaultPrizes));
+      savePrizes();
+      drawWheel();
+      updateStockList();
+    }
+  });
+
+  loadPrizes();
+  drawWheel();
+  updateStockList();
+</script>
+</body>
+</html>
