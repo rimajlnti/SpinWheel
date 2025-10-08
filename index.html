@@ -14,7 +14,7 @@
     color: white;
     min-height: 100vh;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
   }
 
@@ -22,8 +22,7 @@
     position: relative;
     width: 84vw;
     max-width: 400px;
-    aspect-ratio: 1 / 1;
-    margin-top: calc(16vh + 50px);
+    aspect-ratio: 1/1;
   }
 
   #wheel {
@@ -32,8 +31,8 @@
     border-radius: 50%;
     border: 6px solid white;
     position: relative;
-    background: rgba(0,0,0,0.1);
     overflow: hidden;
+    background: rgba(0,0,0,0.1);
   }
 
   #wheelCanvas {
@@ -43,41 +42,35 @@
   }
 
   #spinBtn {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  padding: 15px 25px;
-  background: rgba(255, 0, 0, 0); /* transparan */
-  color: black;                   /* teks tetap putih */
-  border: 2px solid rgba(255,255,255,0.7); /* optional: border tipis agar terlihat */
-  font-size: 25px;
-  border-radius: 50%;
-  cursor: pointer;
-  z-index: 5;
-}
-#spinBtn:hover {
-  background: rgba(255,255,255,0.1); /* efek hover sedikit terang */
-}
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px 25px;
+    background: rgba(255, 0, 0, 0); /* bisa transparan */
+    color: black;
+    border: none;
+    font-size: 25px;
+    cursor: pointer;
+    z-index: 5;
+  }
 
   #toggleStockBtn {
-  position: absolute;
-  top: 460px;       /* jarak dari atas wheelContainer */
-  right: 10px;     /* jarak dari kanan wheelContainer */
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  background: rgba(0,0,0,0.6);
-  border: 1px solid white;
-  border-radius: 50%;
-  font-size: 20px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-}
-
+    position: absolute;
+    bottom: 10px;   /* kanan bawah wheel */
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    background: rgba(0,0,0,0.6);
+    border: 1px solid white;
+    border-radius: 50%;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+  }
 
   #stockList {
     margin-top: 15px;
@@ -125,7 +118,7 @@
     text-align: center;
   }
 
-  #popup h1 { font-size: 2.5em; margin-bottom: 20px; }
+  #popup h1 { font-size: 2em; margin-bottom: 20px; }
   #doneBtn {
     padding: 10px 20px;
     font-size: 18px;
@@ -143,10 +136,9 @@
   <div id="wheel">
     <canvas id="wheelCanvas"></canvas>
     <button id="spinBtn">🎯</button>
+    <button id="toggleStockBtn">📋</button>
   </div>
 </div>
-
-<button id="toggleStockBtn">📋</button>
 
 <div id="stockList">
   <ul id="stockUl"></ul>
@@ -205,32 +197,30 @@ function resizeCanvas() {
 }
 
 function drawWheel() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const radius = canvas.width/2;
+  const arcSize = 2*Math.PI / totalSlices;
   const colors = ['#2332EB', '#9EB2DB', '#4E6EF2'];
-  const radius = canvas.width / 2;
-  const arcSize = (2 * Math.PI) / totalSlices;
 
-  for (let i = 0; i < totalSlices; i++) {
-    const angle = i * arcSize;
-    ctx.fillStyle = colors[i % 3];
+  for(let i=0;i<totalSlices;i++){
+    const angle = i*arcSize;
+    ctx.fillStyle = colors[i%3];
     ctx.beginPath();
-    ctx.moveTo(radius, radius);
-    ctx.arc(radius, radius, radius, angle, angle + arcSize);
+    ctx.moveTo(radius,radius);
+    ctx.arc(radius,radius,radius,angle,angle+arcSize);
     ctx.closePath();
     ctx.fill();
 
-    // gambar teks
+    // teks rapi di dalam slice
     ctx.save();
-    ctx.translate(radius, radius);
-    ctx.rotate(angle + arcSize / 2);
+    ctx.translate(radius,radius);
+    ctx.rotate(angle + arcSize/2);
     ctx.fillStyle = "white";
-    ctx.textAlign = "right";
-    
-    let fontSize = radius / 10; // proporsional dengan radius
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    let fontSize = radius/10;
     ctx.font = `bold ${fontSize}px Arial`;
-
-    // posisikan teks menjauh dari pusat, misal 70% dari radius
-    const textRadius = radius * 0.7; 
+    const textRadius = radius*0.6;
     ctx.fillText(prizes[i].name, textRadius, 0);
     ctx.restore();
   }
@@ -238,86 +228,81 @@ function drawWheel() {
 
 function updateStockList() {
   stockUl.innerHTML = "";
-  prizes.forEach(p => {
-    const li = document.createElement("li");
-    li.innerHTML = `<span>${p.name}</span><span>${p.stock}</span>`;
+  prizes.forEach(p=>{
+    const li=document.createElement("li");
+    li.innerHTML=`<span>${p.name}</span><span>${p.stock}</span>`;
     stockUl.appendChild(li);
   });
 }
 
-function pickPrize() {
-  let totalStock = prizes.reduce((sum, p) => sum + p.stock, 0);
-  let r = Math.random() * totalStock;
-  let acc = 0;
-  for (let p of prizes) {
-    acc += p.stock;
-    if (r <= acc) return p;
+function pickPrize(){
+  let totalStock = prizes.reduce((sum,p)=>sum+p.stock,0);
+  let r=Math.random()*totalStock;
+  let acc=0;
+  for(let p of prizes){
+    acc+=p.stock;
+    if(r<=acc) return p;
   }
 }
 
-function showPopup(prize) {
+function showPopup(prize){
   popupText.textContent = `🎉 Selamat Kamu dapat: ${prize}`;
   popup.style.display = "flex";
-  confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
+  confetti({ particleCount:200, spread:80, origin:{y:0.6} });
 }
 
-doneBtn.addEventListener("click", () => popup.style.display = "none");
+doneBtn.addEventListener("click",()=>popup.style.display="none");
 
-spinBtn.addEventListener("click", () => {
-  if (isSpinning) return;
-  const available = prizes.filter(p => p.stock > 0);
-  if (available.length === 0) {
-    showPopup("🎁 Stok hadiah sudah habis!");
-    return;
-  }
+spinBtn.addEventListener("click",()=>{
+  if(isSpinning) return;
+  const available = prizes.filter(p=>p.stock>0);
+  if(available.length===0){ showPopup("🎁 Stok hadiah sudah habis!"); return; }
 
   isSpinning = true;
   let selectedPrize = pickPrize();
-  if (!selectedPrize || selectedPrize.stock === 0) {
-    selectedPrize = available[Math.floor(Math.random() * available.length)];
+  if(!selectedPrize || selectedPrize.stock===0){
+    selectedPrize = available[Math.floor(Math.random()*available.length)];
   }
 
   const prizeIndex = prizes.indexOf(selectedPrize);
-  const sliceAngle = 360 / totalSlices;
-  const randomSpin = 360 * 5; 
-  const targetAngle = 90 - (prizeIndex * sliceAngle + sliceAngle / 2);
+  const sliceAngle = 360/totalSlices;
+  const randomSpin = 360*5;
+  const targetAngle = 90 - (prizeIndex*sliceAngle + sliceAngle/2);
   const finalRotation = randomSpin + targetAngle;
 
-  wheel.style.transition = 'transform 4s cubic-bezier(0.33, 1, 0.68, 1)';
+  wheel.style.transition = 'transform 4s cubic-bezier(0.33,1,0.68,1)';
   wheel.style.transform = `rotate(${finalRotation}deg)`;
 
-  wheel.addEventListener('transitionend', () => {
-    currentRotation = finalRotation % 360;
-    wheel.style.transition = 'none';
-    wheel.style.transform = `rotate(${currentRotation}deg)`;
+  wheel.addEventListener('transitionend',()=>{
+    currentRotation = finalRotation%360;
+    wheel.style.transition='none';
+    wheel.style.transform=`rotate(${currentRotation}deg)`;
     selectedPrize.stock--;
     savePrizes();
     updateStockList();
     showPopup(selectedPrize.name);
-    isSpinning = false;
-  }, { once: true });
+    isSpinning=false;
+  },{once:true});
 });
 
-toggleStockBtn.addEventListener("click", () => {
-  if (stockList.style.display === "none") {
-    stockList.style.display = "block";
-    toggleStockBtn.textContent = "📋";
-  } else {
-    stockList.style.display = "none";
-    toggleStockBtn.textContent = "📋";
+toggleStockBtn.addEventListener("click",()=>{
+  if(stockList.style.display==="none"){
+    stockList.style.display="block";
+  }else{
+    stockList.style.display="none";
   }
 });
 
-resetBtn.addEventListener("click", () => {
-  if (confirm("Yakin ingin reset stok hadiah ke default?")) {
-    prizes = JSON.parse(JSON.stringify(defaultPrizes));
+resetBtn.addEventListener("click",()=>{
+  if(confirm("Yakin ingin reset stok hadiah ke default?")){
+    prizes=JSON.parse(JSON.stringify(defaultPrizes));
     savePrizes();
     drawWheel();
     updateStockList();
   }
 });
 
-window.addEventListener('resize', resizeCanvas);
+window.addEventListener('resize',resizeCanvas);
 
 loadPrizes();
 resizeCanvas();
@@ -325,27 +310,3 @@ updateStockList();
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
