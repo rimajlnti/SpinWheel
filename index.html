@@ -12,26 +12,18 @@
     background-size: cover;
     font-family: Arial, sans-serif;
     color: white;
-    text-shadow: 1px 1px 4px black;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
   }
 
-  header { text-align: center; padding-top: 25px; }
-  header h1 { font-size: 1.8em; margin: 0; font-weight: bold; }
-  header h2 { font-size: 1.1em; margin: 5px 0 0 0; font-weight: normal; }
-
   #wheelContainer {
     position: relative;
     width: 80vw;
-    max-width: 380px;
+    max-width: 400px;
     aspect-ratio: 1/1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 25px;
+    margin-top: 50px;
   }
 
   #wheel {
@@ -41,6 +33,7 @@
     border: 6px solid white;
     position: relative;
     background: rgba(0,0,0,0.1);
+    overflow: hidden;
   }
   #wheelCanvas { width: 100%; height: 100%; }
 
@@ -68,21 +61,6 @@
     border-radius: 6px;
     cursor: pointer;
   }
-
-  #logoArea { margin-top: 20px; text-align: center; }
-  .logoContainer {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    flex-wrap: wrap;
-    margin-bottom: 8px;
-  }
-  .logoContainer img {
-    height: 40px;
-    max-width: 90px;
-    object-fit: contain;
-  }
-  #eventText { font-size: 1em; font-weight: bold; text-align: center; margin-top: 10px; }
 
   #stockList {
     margin-top: 15px;
@@ -141,34 +119,15 @@
 </style>
 </head>
 <body>
-  <header>
-    <h1>TORAJAR ROADSTER</h1>
-    <h2>DeVilbiss Give Away</h2>
-  </header>
 
   <div id="wheelContainer">
     <div id="wheel">
-      <canvas id="wheelCanvas" width="320" height="320"></canvas>
+      <canvas id="wheelCanvas" width="400" height="400"></canvas>
       <button id="spinBtn">🎯 SPIN</button>
     </div>
   </div>
 
   <button id="toggleStockBtn">📋 Lihat Stok Hadiah</button>
-
-  <div id="eventText">
-    <div>INDONESIA</div>
-    <div>MODIFICATION & LIFESTYLE EXPO 2025</div>
-    <div>OCTOBER 10-12, 2025 ICE - BSD</div>
-  </div>
-
-  <div id="logoArea">
-    <div class="logoContainer">
-      <img src="logo_plan.png" alt="Logo Plan"/>
-      <img src="logo_devilbiss.png" alt="Logo Devilbiss"/>
-      <img src="logo_freeflow.png" alt="Logo Freeflow"/>
-      <img src="logo_gb.png" alt="Logo GB"/>
-    </div>
-  </div>
 
   <div id="stockList">
     <ul id="stockUl"></ul>
@@ -182,157 +141,157 @@
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script>
-  const defaultPrizes = [
-    { name: "Sticker", stock: 7 },
-    { name: "Pulpen", stock: 16 },
-    { name: "Topi", stock: 2 },
-    { name: "Kaos Toraja Roadster", stock: 1 },
-    { name: "PhotoCard", stock: 1 },
-    { name: "Kaos ESA + Devilbiss", stock: 1 },
-    { name: "Flash Disc", stock: 4 },
-    { name: "Voucher Tokped Disc 10%", stock: 3 },
-    { name: "Voucher Tokped Disc 20%", stock: 3 },
-  ];
+const defaultPrizes = [
+  { name: "Sticker", stock: 7 },
+  { name: "Pulpen", stock: 16 },
+  { name: "Topi", stock: 2 },
+  { name: "Kaos Toraja Roadster", stock: 1 },
+  { name: "PhotoCard", stock: 1 },
+  { name: "Kaos ESA + Devilbiss", stock: 1 },
+  { name: "Flash Disc", stock: 4 },
+  { name: "Voucher Tokped Disc 10%", stock: 3 },
+  { name: "Voucher Tokped Disc 20%", stock: 3 },
+];
 
-  let prizes = [];
-  const wheel = document.getElementById("wheel");
-  const canvas = document.getElementById("wheelCanvas");
-  const ctx = canvas.getContext("2d");
-  const spinBtn = document.getElementById("spinBtn");
-  const toggleStockBtn = document.getElementById("toggleStockBtn");
-  const stockList = document.getElementById("stockList");
-  const stockUl = document.getElementById("stockUl");
-  const resetBtn = document.getElementById("resetBtn");
-  const popup = document.getElementById("popup");
-  const popupText = document.getElementById("popupText");
-  const doneBtn = document.getElementById("doneBtn");
+let prizes = [];
+const wheel = document.getElementById("wheel");
+const canvas = document.getElementById("wheelCanvas");
+const ctx = canvas.getContext("2d");
+const spinBtn = document.getElementById("spinBtn");
+const toggleStockBtn = document.getElementById("toggleStockBtn");
+const stockList = document.getElementById("stockList");
+const stockUl = document.getElementById("stockUl");
+const resetBtn = document.getElementById("resetBtn");
+const popup = document.getElementById("popup");
+const popupText = document.getElementById("popupText");
+const doneBtn = document.getElementById("doneBtn");
 
-  const totalSlices = defaultPrizes.length;
-  const arcSize = (2 * Math.PI) / totalSlices;
-  let currentRotation = 0;
-  let isSpinning = false;
+const totalSlices = defaultPrizes.length;
+const arcSize = (2 * Math.PI) / totalSlices;
+let currentRotation = 0;
+let isSpinning = false;
 
-  function loadPrizes() {
-    const saved = localStorage.getItem("spinPrizes");
-    prizes = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultPrizes));
-  }
-  function savePrizes() {
-    localStorage.setItem("spinPrizes", JSON.stringify(prizes));
-  }
+function loadPrizes() {
+  const saved = localStorage.getItem("spinPrizes");
+  prizes = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultPrizes));
+}
+function savePrizes() {
+  localStorage.setItem("spinPrizes", JSON.stringify(prizes));
+}
 
-  function drawWheel() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const colors = ['#2332EB', '#9EB2DB', '#4E6EF2'];
-    for (let i = 0; i < totalSlices; i++) {
-      const angle = i * arcSize;
-      ctx.fillStyle = colors[i % 3];
-      ctx.beginPath();
-      ctx.moveTo(160, 160);
-      ctx.arc(160, 160, 160, angle, angle + arcSize);
-      ctx.closePath();
-      ctx.fill();
+function drawWheel() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const colors = ['#2332EB', '#9EB2DB', '#4E6EF2'];
+  for (let i = 0; i < totalSlices; i++) {
+    const angle = i * arcSize;
+    ctx.fillStyle = colors[i % 3];
+    ctx.beginPath();
+    ctx.moveTo(200, 200);
+    ctx.arc(200, 200, 200, angle, angle + arcSize);
+    ctx.closePath();
+    ctx.fill();
 
-      ctx.save();
-      ctx.translate(160, 160);
-      ctx.rotate(angle + arcSize / 2);
-      ctx.textAlign = "right";
-      ctx.fillStyle = "white";
-      let fontSize = 18;
-      const maxWidth = 120;
+    ctx.save();
+    ctx.translate(200, 200);
+    ctx.rotate(angle + arcSize / 2);
+    ctx.textAlign = "right";
+    ctx.fillStyle = "white";
+    let fontSize = 18;
+    const maxWidth = 120;
+    ctx.font = `bold ${fontSize}px Arial`;
+    while (ctx.measureText(prizes[i].name).width > maxWidth && fontSize > 8) {
+      fontSize--;
       ctx.font = `bold ${fontSize}px Arial`;
-      while (ctx.measureText(prizes[i].name).width > maxWidth && fontSize > 8) {
-        fontSize--;
-        ctx.font = `bold ${fontSize}px Arial`;
-      }
-      ctx.fillText(prizes[i].name, 140, 5);
-      ctx.restore();
     }
+    ctx.fillText(prizes[i].name, 180, 5);
+    ctx.restore();
   }
+}
 
-  function updateStockList() {
-    stockUl.innerHTML = "";
-    prizes.forEach(p => {
-      const li = document.createElement("li");
-      li.innerHTML = `<span>${p.name}</span><span>${p.stock}</span>`;
-      stockUl.appendChild(li);
-    });
-  }
-
-  function pickPrize() {
-    let totalStock = prizes.reduce((sum, p) => sum + p.stock, 0);
-    let r = Math.random() * totalStock;
-    let acc = 0;
-    for (let p of prizes) {
-      acc += p.stock;
-      if (r <= acc) return p;
-    }
-  }
-
-  function showPopup(prize) {
-    popupText.textContent = `🎉 Selamat Kamu dapat: ${prize}`;
-    popup.style.display = "flex";
-    confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
-  }
-
-  doneBtn.addEventListener("click", () => popup.style.display = "none");
-
-  spinBtn.addEventListener("click", () => {
-    if (isSpinning) return;
-    const available = prizes.filter(p => p.stock > 0);
-    if (available.length === 0) {
-      showPopup("🎁 Stok hadiah sudah habis!");
-      return;
-    }
-
-    isSpinning = true;
-    let selectedPrize = pickPrize();
-    if (!selectedPrize || selectedPrize.stock === 0) {
-      selectedPrize = available[Math.floor(Math.random() * available.length)];
-    }
-
-    const prizeIndex = prizes.indexOf(selectedPrize);
-    const sliceAngle = 360 / totalSlices;
-    const randomSpin = 360 * 5; 
-    const targetAngle = 90 - (prizeIndex * sliceAngle + sliceAngle / 2);
-    const finalRotation = randomSpin + targetAngle;
-
-    wheel.style.transition = 'transform 4s cubic-bezier(0.33, 1, 0.68, 1)';
-    wheel.style.transform = `rotate(${finalRotation}deg)`;
-
-    wheel.addEventListener('transitionend', () => {
-      currentRotation = finalRotation % 360;
-      wheel.style.transition = 'none';
-      wheel.style.transform = `rotate(${currentRotation}deg)`;
-      selectedPrize.stock--;
-      savePrizes();
-      updateStockList();
-      showPopup(selectedPrize.name);
-      isSpinning = false;
-    }, { once: true });
+function updateStockList() {
+  stockUl.innerHTML = "";
+  prizes.forEach(p => {
+    const li = document.createElement("li");
+    li.innerHTML = `<span>${p.name}</span><span>${p.stock}</span>`;
+    stockUl.appendChild(li);
   });
+}
 
-  toggleStockBtn.addEventListener("click", () => {
-    if (stockList.style.display === "none") {
-      stockList.style.display = "block";
-      toggleStockBtn.textContent = "📋 Sembunyikan Stok Hadiah";
-    } else {
-      stockList.style.display = "none";
-      toggleStockBtn.textContent = "📋 Lihat Stok Hadiah";
-    }
-  });
+function pickPrize() {
+  let totalStock = prizes.reduce((sum, p) => sum + p.stock, 0);
+  let r = Math.random() * totalStock;
+  let acc = 0;
+  for (let p of prizes) {
+    acc += p.stock;
+    if (r <= acc) return p;
+  }
+}
 
-  resetBtn.addEventListener("click", () => {
-    if (confirm("Yakin ingin reset stok hadiah ke default?")) {
-      prizes = JSON.parse(JSON.stringify(defaultPrizes));
-      savePrizes();
-      drawWheel();
-      updateStockList();
-    }
-  });
+function showPopup(prize) {
+  popupText.textContent = `🎉 Selamat Kamu dapat: ${prize}`;
+  popup.style.display = "flex";
+  confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
+}
 
-  loadPrizes();
-  drawWheel();
-  updateStockList();
+doneBtn.addEventListener("click", () => popup.style.display = "none");
+
+spinBtn.addEventListener("click", () => {
+  if (isSpinning) return;
+  const available = prizes.filter(p => p.stock > 0);
+  if (available.length === 0) {
+    showPopup("🎁 Stok hadiah sudah habis!");
+    return;
+  }
+
+  isSpinning = true;
+  let selectedPrize = pickPrize();
+  if (!selectedPrize || selectedPrize.stock === 0) {
+    selectedPrize = available[Math.floor(Math.random() * available.length)];
+  }
+
+  const prizeIndex = prizes.indexOf(selectedPrize);
+  const sliceAngle = 360 / totalSlices;
+  const randomSpin = 360 * 5; 
+  const targetAngle = 90 - (prizeIndex * sliceAngle + sliceAngle / 2);
+  const finalRotation = randomSpin + targetAngle;
+
+  wheel.style.transition = 'transform 4s cubic-bezier(0.33, 1, 0.68, 1)';
+  wheel.style.transform = `rotate(${finalRotation}deg)`;
+
+  wheel.addEventListener('transitionend', () => {
+    currentRotation = finalRotation % 360;
+    wheel.style.transition = 'none';
+    wheel.style.transform = `rotate(${currentRotation}deg)`;
+    selectedPrize.stock--;
+    savePrizes();
+    updateStockList();
+    showPopup(selectedPrize.name);
+    isSpinning = false;
+  }, { once: true });
+});
+
+toggleStockBtn.addEventListener("click", () => {
+  if (stockList.style.display === "none") {
+    stockList.style.display = "block";
+    toggleStockBtn.textContent = "📋 Sembunyikan Stok Hadiah";
+  } else {
+    stockList.style.display = "none";
+    toggleStockBtn.textContent = "📋 Lihat Stok Hadiah";
+  }
+});
+
+resetBtn.addEventListener("click", () => {
+  if (confirm("Yakin ingin reset stok hadiah ke default?")) {
+    prizes = JSON.parse(JSON.stringify(defaultPrizes));
+    savePrizes();
+    drawWheel();
+    updateStockList();
+  }
+});
+
+loadPrizes();
+drawWheel();
+updateStockList();
 </script>
 </body>
 </html>
