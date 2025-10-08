@@ -229,8 +229,9 @@ function drawWheel() {
     ctx.font = `bold ${fontSize}px Arial`;
 
     // posisikan teks menjauh dari pusat, misal 70% dari radius
-    const textRadius = radius * 0.7; 
-    ctx.fillText(prizes[i].name, textRadius, 0);
+    // posisikan teks menjauh dari pusat, misal 85% dari radius
+const textRadius = radius * 0.85; 
+ctx.fillText(prizes[i].name, textRadius, 0);
     ctx.restore();
   }
 }
@@ -324,6 +325,7 @@ updateStockList();
 </script>
 </body>
 </html>
+
 
 
 
