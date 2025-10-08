@@ -22,7 +22,7 @@
     position: relative;
     width: 80vw;
     max-width: 400px;
-    aspect-ratio: 1/1;
+    aspect-ratio: 1 / 1;
     margin-top: 50px;
   }
 
@@ -35,7 +35,12 @@
     background: rgba(0,0,0,0.1);
     overflow: hidden;
   }
-  #wheelCanvas { width: 100%; height: 100%; }
+
+  #wheelCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
 
   #spinBtn {
     position: absolute;
@@ -74,6 +79,7 @@
     max-width: 400px;
     display: none;
   }
+
   #stockList ul { list-style: none; padding: 0; margin: 0; }
   #stockList li {
     display: flex;
@@ -106,6 +112,7 @@
     color: white;
     text-align: center;
   }
+
   #popup h1 { font-size: 2.5em; margin-bottom: 20px; }
   #doneBtn {
     padding: 10px 20px;
@@ -120,24 +127,24 @@
 </head>
 <body>
 
-  <div id="wheelContainer">
-    <div id="wheel">
-      <canvas id="wheelCanvas" width="400" height="400"></canvas>
-      <button id="spinBtn">🎯 SPIN</button>
-    </div>
+<div id="wheelContainer">
+  <div id="wheel">
+    <canvas id="wheelCanvas"></canvas>
+    <button id="spinBtn">🎯 SPIN</button>
   </div>
+</div>
 
-  <button id="toggleStockBtn">📋 Lihat Stok Hadiah</button>
+<button id="toggleStockBtn">📋 Lihat Stok Hadiah</button>
 
-  <div id="stockList">
-    <ul id="stockUl"></ul>
-    <button id="resetBtn">🔄 Reset Stok Hadiah</button>
-  </div>
+<div id="stockList">
+  <ul id="stockUl"></ul>
+  <button id="resetBtn">🔄 Reset Stok Hadiah</button>
+</div>
 
-  <div id="popup">
-    <h1 id="popupText"></h1>
-    <button id="doneBtn">Selesai</button>
-  </div>
+<div id="popup">
+  <h1 id="popupText"></h1>
+  <button id="doneBtn">Selesai</button>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script>
@@ -167,7 +174,6 @@ const popupText = document.getElementById("popupText");
 const doneBtn = document.getElementById("doneBtn");
 
 const totalSlices = defaultPrizes.length;
-const arcSize = (2 * Math.PI) / totalSlices;
 let currentRotation = 0;
 let isSpinning = false;
 
@@ -179,31 +185,36 @@ function savePrizes() {
   localStorage.setItem("spinPrizes", JSON.stringify(prizes));
 }
 
+function resizeCanvas() {
+  const rect = wheel.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+  drawWheel();
+}
+
 function drawWheel() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   const colors = ['#2332EB', '#9EB2DB', '#4E6EF2'];
+  const radius = canvas.width / 2;
+  const arcSize = (2 * Math.PI) / totalSlices;
+
   for (let i = 0; i < totalSlices; i++) {
     const angle = i * arcSize;
     ctx.fillStyle = colors[i % 3];
     ctx.beginPath();
-    ctx.moveTo(200, 200);
-    ctx.arc(200, 200, 200, angle, angle + arcSize);
+    ctx.moveTo(radius, radius);
+    ctx.arc(radius, radius, radius, angle, angle + arcSize);
     ctx.closePath();
     ctx.fill();
 
     ctx.save();
-    ctx.translate(200, 200);
+    ctx.translate(radius, radius);
     ctx.rotate(angle + arcSize / 2);
     ctx.textAlign = "right";
     ctx.fillStyle = "white";
-    let fontSize = 18;
-    const maxWidth = 120;
+    let fontSize = radius / 8;
     ctx.font = `bold ${fontSize}px Arial`;
-    while (ctx.measureText(prizes[i].name).width > maxWidth && fontSize > 8) {
-      fontSize--;
-      ctx.font = `bold ${fontSize}px Arial`;
-    }
-    ctx.fillText(prizes[i].name, 180, 5);
+    ctx.fillText(prizes[i].name, radius * 0.85, 5);
     ctx.restore();
   }
 }
@@ -289,8 +300,10 @@ resetBtn.addEventListener("click", () => {
   }
 });
 
+window.addEventListener('resize', resizeCanvas);
+
 loadPrizes();
-drawWheel();
+resizeCanvas();
 updateStockList();
 </script>
 </body>
