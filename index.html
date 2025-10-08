@@ -54,7 +54,7 @@
     z-index: 10;
   }
 
-  #spinBtn, #resetBtn {
+  #spinBtn, #resetBtn, #toggleStockBtn {
     margin-top: 15px;
     margin-bottom: 15px;
     padding: 15px 25px;
@@ -66,6 +66,11 @@
     cursor: pointer;
   }
   #resetBtn {
+    background: rgba(0,0,0,0.6);
+    font-size: 14px;
+    border: 1px solid white;
+  }
+  #toggleStockBtn {
     background: rgba(0,0,0,0.6);
     font-size: 14px;
     border: 1px solid white;
@@ -96,6 +101,7 @@
     overflow-y: auto;
     width: 90%;
     max-width: 400px;
+    display: none; /* awalnya tersembunyi */
   }
   #stockList ul { list-style: none; padding: 0; margin: 0; }
   #stockList li {
@@ -132,40 +138,38 @@
 </head>
 <body>
   <header>
-    <h1> </h1>
-    <h2> </h2>
+    <h1>TORAJAR ROADSTER</h1>
+    <h2>DeVilbiss Give Away</h2>
   </header>
 
   <div id="wheelContainer">
-    <!-- <div id="arrow"></div> -->
     <div id="wheel">
       <canvas id="wheelCanvas" width="320" height="320"></canvas>
     </div>
   </div>
 
   <button id="spinBtn">🎯 SPIN SEKARANG</button>
+  <button id="toggleStockBtn">📋 Lihat Stok Hadiah</button>
+  <button id="resetBtn">🔄 Reset Stok Hadiah</button>
 
   <div id="eventText">
-    <div> </div>
-    <div> </div>
+    <div>INDONESIA</div>
+    <div>MODIFICATION & LIFESTYLE EXPO 2025</div>
+    <div>OCTOBER 10-12, 2025 ICE - BSD</div>
   </div>
 
   <div id="logoArea">
     <div class="logoContainer">
-      <div> </div>
-    <div> </div>
-    <div> </div>
-    <div> </div>
+      <img src="logo_plan.png" alt="Logo Plan"/>
+      <img src="logo_devilbiss.png" alt="Logo Devilbiss"/>
+      <img src="logo_freeflow.png" alt="Logo Freeflow"/>
+      <img src="logo_gb.png" alt="Logo GB"/>
     </div>
   </div>
 
-  <button id="resetBtn">🔄 Reset Stok Hadiah</button>
-
-  <button id="toggleStockBtn">📋 Lihat Stok Hadiah</button>
-
-<div id="stockList" style="display:none;">
-  <ul id="stockUl"></ul>
-</div>
+  <div id="stockList">
+    <ul id="stockUl"></ul>
+  </div>
 
   <div id="popup">
     <h1 id="popupText"></h1>
@@ -192,6 +196,8 @@
   const ctx = canvas.getContext("2d");
   const spinBtn = document.getElementById("spinBtn");
   const resetBtn = document.getElementById("resetBtn");
+  const toggleStockBtn = document.getElementById("toggleStockBtn");
+  const stockList = document.getElementById("stockList");
   const stockUl = document.getElementById("stockUl");
   const popup = document.getElementById("popup");
   const popupText = document.getElementById("popupText");
@@ -210,45 +216,34 @@
     localStorage.setItem("spinPrizes", JSON.stringify(prizes));
   }
 
-function drawWheel() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  function drawWheel() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const colors = ['#2332EB', '#9EB2DB', '#4E6EF2'];
+    for (let i = 0; i < totalSlices; i++) {
+      const angle = i * arcSize;
+      ctx.fillStyle = colors[i % 3];
+      ctx.beginPath();
+      ctx.moveTo(160, 160);
+      ctx.arc(160, 160, 160, angle, angle + arcSize);
+      ctx.closePath();
+      ctx.fill();
 
-  // 🌀 Tiga warna sektor
-  const colors = ['#2332EB', '#9EB2DB', '#4E6EF2']; // biru tua, biru muda, biru sedang
-
-  for (let i = 0; i < totalSlices; i++) {
-    const angle = i * arcSize;
-
-    // Pilih warna berdasarkan index sektor
-    ctx.fillStyle = colors[i % 3];
-
-    ctx.beginPath();
-    ctx.moveTo(160, 160);
-    ctx.arc(160, 160, 160, angle, angle + arcSize);
-    ctx.closePath();
-    ctx.fill();
-
-    // ===== TEKS =====
-    ctx.save();
-    ctx.translate(160, 160);
-    ctx.rotate(angle + arcSize / 2);
-    ctx.textAlign = "right";
-    ctx.fillStyle = "white";
-
-    // Ukuran font dinamis
-    let fontSize = 18;
-    const maxWidth = 120;
-    ctx.font = `bold ${fontSize}px Arial`;
-
-    while (ctx.measureText(prizes[i].name).width > maxWidth && fontSize > 8) {
-      fontSize--;
+      ctx.save();
+      ctx.translate(160, 160);
+      ctx.rotate(angle + arcSize / 2);
+      ctx.textAlign = "right";
+      ctx.fillStyle = "white";
+      let fontSize = 18;
+      const maxWidth = 120;
       ctx.font = `bold ${fontSize}px Arial`;
+      while (ctx.measureText(prizes[i].name).width > maxWidth && fontSize > 8) {
+        fontSize--;
+        ctx.font = `bold ${fontSize}px Arial`;
+      }
+      ctx.fillText(prizes[i].name, 140, 5);
+      ctx.restore();
     }
-
-    ctx.fillText(prizes[i].name, 140, 5);
-    ctx.restore();
   }
-}
 
   function updateStockList() {
     stockUl.innerHTML = "";
@@ -292,8 +287,6 @@ function drawWheel() {
 
     const prizeIndex = prizes.indexOf(selectedPrize);
     const sliceAngle = 360 / totalSlices;
-
-    // Offset 90° karena panah di atas
     const randomSpin = 360 * 5; 
     const targetAngle = 90 - (prizeIndex * sliceAngle + sliceAngle / 2);
     const finalRotation = randomSpin + targetAngle;
@@ -322,12 +315,19 @@ function drawWheel() {
     }
   });
 
+  toggleStockBtn.addEventListener("click", () => {
+    if (stockList.style.display === "none") {
+      stockList.style.display = "block";
+      toggleStockBtn.textContent = "📋 Sembunyikan Stok Hadiah";
+    } else {
+      stockList.style.display = "none";
+      toggleStockBtn.textContent = "📋 Lihat Stok Hadiah";
+    }
+  });
+
   loadPrizes();
   drawWheel();
   updateStockList();
 </script>
 </body>
 </html>
-
-
-
