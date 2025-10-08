@@ -208,28 +208,43 @@
     localStorage.setItem("spinPrizes", JSON.stringify(prizes));
   }
 
-  function drawWheel() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i < totalSlices; i++) {
-      const angle = i * arcSize;
-      ctx.fillStyle = i % 2 === 0 ? '#ff6600' : '#ffaa00';
-      ctx.beginPath();
-      ctx.moveTo(160, 160);
-      ctx.arc(160, 160, 160, angle, angle + arcSize);
-      ctx.closePath();
-      ctx.fill();
+function drawWheel() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      ctx.save();
-      ctx.translate(160, 160);
-      ctx.rotate(angle + arcSize / 2);
-      ctx.textAlign = "right";
-      ctx.fillStyle = "white";
-      ctx.font = "bold 13px Arial";
-      ctx.fillText(prizes[i].name, 140, 5);
-      ctx.restore();
+  for (let i = 0; i < totalSlices; i++) {
+    const angle = i * arcSize;
+
+    // Warna sektor
+    ctx.fillStyle = i % 2 === 0 ? '#ff6600' : '#ffaa00';
+    ctx.beginPath();
+    ctx.moveTo(160, 160);
+    ctx.arc(160, 160, 160, angle, angle + arcSize);
+    ctx.closePath();
+    ctx.fill();
+
+    // ===== TEKS =====
+    ctx.save();
+    ctx.translate(160, 160);
+    ctx.rotate(angle + arcSize / 2);
+    ctx.textAlign = "right";
+    ctx.fillStyle = "white";
+
+    // Atur ukuran font dinamis
+    let fontSize = 18; // maksimal
+    const maxWidth = 120; // batas maksimum lebar teks (sesuaikan)
+    ctx.font = `bold ${fontSize}px Arial`;
+
+    // Jika teks terlalu panjang, kecilkan ukuran font
+    while (ctx.measureText(prizes[i].name).width > maxWidth && fontSize > 8) {
+      fontSize--;
+      ctx.font = `bold ${fontSize}px Arial`;
     }
-  }
 
+    // Gambar teks
+    ctx.fillText(prizes[i].name, 140, 5);
+    ctx.restore();
+  }
+}
   function updateStockList() {
     stockUl.innerHTML = "";
     prizes.forEach(p => {
