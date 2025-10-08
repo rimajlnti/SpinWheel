@@ -289,7 +289,7 @@
 
     const prizeIndex = prizes.indexOf(selectedPrize);
     const sliceAngle = 360 / totalSlices;
-    const randomSpin = (360 * 5) + (360 - (prizeIndex * sliceAngle + sliceAngle / 2));
+    const randomSpin = (360 * 5) + (90 - (prizeIndex * sliceAngle + sliceAngle / 2));
     const finalRotation = currentRotation + randomSpin;
 
     wheel.style.transition = 'transform 4s cubic-bezier(0.33, 1, 0.68, 1)';
@@ -322,3 +322,4 @@
 </script>
 </body>
 </html>
+
