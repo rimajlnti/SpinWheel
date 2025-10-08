@@ -215,7 +215,7 @@ function drawWheel() {
     const angle = i * arcSize;
 
     // Warna sektor
-    ctx.fillStyle = i % 2 === 0 ? '#ff6600' : '#ffaa00';
+    ctx.fillStyle = i % 2 === 0 ? 'rgba(0, 123, 255, 0.7)' : 'rgba(0, 90, 200, 0.7)';
     ctx.beginPath();
     ctx.moveTo(160, 160);
     ctx.arc(160, 160, 160, angle, angle + arcSize);
@@ -323,4 +323,3 @@ function drawWheel() {
 </script>
 </body>
 </html>
-
