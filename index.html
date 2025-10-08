@@ -8,8 +8,8 @@
   html, body {
     margin: 0;
     padding: 0;
-    background: url('poster.jpg') no-repeat center top;
-    background-size: cover;
+    background: url('poster.png') no-repeat center top;
+    background-size: 110%;
     font-family: Arial, sans-serif;
     color: white;
     text-shadow: 1px 1px 4px black;
@@ -19,7 +19,7 @@
     align-items: center;
   }
 
-  header { text-align: center; padding-top: 20px; }
+  header { text-align: center; padding-top: 25px; }
   header h1 { font-size: 1.8em; margin: 0; font-weight: bold; }
   header h2 { font-size: 1.1em; margin: 5px 0 0 0; font-weight: normal; }
 
@@ -132,8 +132,8 @@
 </head>
 <body>
   <header>
-    <h1>TORAJA ROADSTER</h1>
-    <h2>DeVilbiss Giveaway</h2>
+    <h1> </h1>
+    <h2> </h2>
   </header>
 
   <div id="wheelContainer">
@@ -146,16 +146,16 @@
   <button id="spinBtn">🎯 SPIN SEKARANG</button>
 
   <div id="eventText">
-    <div>IMX 2025</div>
-    <div>10–12 October</div>
+    <div> </div>
+    <div> </div>
   </div>
 
   <div id="logoArea">
     <div class="logoContainer">
-      <img src="logo1.png" alt="logo 1">
-      <img src="logo2.png" alt="logo 2">
-      <img src="logo3.png" alt="logo 3">
-      <img src="logo4.png" alt="logo 4">
+      <div> </div>
+    <div> </div>
+    <div> </div>
+    <div> </div>
     </div>
   </div>
 
@@ -211,11 +211,15 @@
 function drawWheel() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  // 🌀 Tiga warna sektor
+  const colors = ['#2332EB', '#9EB2DB', '#4E6EF2']; // biru tua, biru muda, biru sedang
+
   for (let i = 0; i < totalSlices; i++) {
     const angle = i * arcSize;
 
-    // Warna sektor
-    ctx.fillStyle = i % 2 === 0 ? '#2332EB' : '#9EB2DB';
+    // Pilih warna berdasarkan index sektor
+    ctx.fillStyle = colors[i % 3];
+
     ctx.beginPath();
     ctx.moveTo(160, 160);
     ctx.arc(160, 160, 160, angle, angle + arcSize);
@@ -229,22 +233,21 @@ function drawWheel() {
     ctx.textAlign = "right";
     ctx.fillStyle = "white";
 
-    // Atur ukuran font dinamis
-    let fontSize = 18; // maksimal
-    const maxWidth = 120; // batas maksimum lebar teks (sesuaikan)
+    // Ukuran font dinamis
+    let fontSize = 18;
+    const maxWidth = 120;
     ctx.font = `bold ${fontSize}px Arial`;
 
-    // Jika teks terlalu panjang, kecilkan ukuran font
     while (ctx.measureText(prizes[i].name).width > maxWidth && fontSize > 8) {
       fontSize--;
       ctx.font = `bold ${fontSize}px Arial`;
     }
 
-    // Gambar teks
     ctx.fillText(prizes[i].name, 140, 5);
     ctx.restore();
   }
 }
+
   function updateStockList() {
     stockUl.innerHTML = "";
     prizes.forEach(p => {
@@ -323,4 +326,3 @@ function drawWheel() {
 </script>
 </body>
 </html>
-
