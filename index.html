@@ -229,8 +229,8 @@ function drawWheel() {
 
     let fontSize = radius / 10; // sebelumnya radius/8 → bisa coba radius/10
 ctx.font = `bold ${fontSize}px Arial`;
-ctx.fillText(prizes[i].name, radius * 0.75, 0);
-
+const textRadius = radius * 0.7; 
+    ctx.fillText(prizes[i].name, textRadius, 0);
     ctx.restore();
   }
 }
@@ -324,6 +324,7 @@ updateStockList();
 </script>
 </body>
 </html>
+
 
 
 
