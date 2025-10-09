@@ -70,6 +70,14 @@
 </div>
 
 <button id="toggleStockBtn">📋</button>
+<!-- Popup Password untuk akses stok -->
+<div id="stockPasswordPopup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:3000;">
+  <div style="background:#111; padding:20px; border-radius:10px; max-width:300px; width:90%; text-align:center;">
+    <h3>Masukkan Password</h3>
+    <input id="stockPasswordInput" type="password" placeholder="Password" style="width:100%; padding:10px; margin:10px 0; border-radius:6px; border:1px solid #333; background:#222; color:#fff;">
+    <button id="stockPasswordSubmit" style="width:100%; padding:10px; background:#0ea5e9; color:#000; font-weight:bold; border:none; border-radius:6px; cursor:pointer;">OK</button>
+  </div>
+</div>
 
 <div id="stockList">
   <ul id="stockUl"></ul>
@@ -122,6 +130,11 @@ const canvas = document.getElementById("wheelCanvas");
 const ctx = canvas.getContext("2d");
 const spinBtn = document.getElementById("spinBtn");
 const toggleStockBtn = document.getElementById("toggleStockBtn");
+  const stockPasswordPopup = document.getElementById("stockPasswordPopup");
+const stockPasswordInput = document.getElementById("stockPasswordInput");
+const stockPasswordSubmit = document.getElementById("stockPasswordSubmit");
+
+let stockAccessGranted = false;
 const stockList = document.getElementById("stockList");
 const stockUl = document.getElementById("stockUl");
 const resetBtn = document.getElementById("resetBtn");
@@ -415,12 +428,36 @@ function showPopup(text) {
 
 /* ---------- UI interactions ---------- */
 toggleStockBtn.addEventListener("click", () => {
+  if (!stockAccessGranted) {
+    stockPasswordPopup.style.display = "flex";
+    stockPasswordInput.value = "";
+    stockPasswordInput.focus();
+    return;
+  }
+
   if (stockList.style.display === "none" || stockList.style.display === "") {
     stockList.style.display = "block";
   } else {
     stockList.style.display = "none";
   }
 });
+  stockPasswordSubmit.addEventListener("click", () => {
+  const val = stockPasswordInput.value.trim();
+  if (val === "esautomation") {
+    stockAccessGranted = true;
+    stockPasswordPopup.style.display = "none";
+    stockList.style.display = "block";
+  } else {
+    alert("❌ Password salah!");
+    stockPasswordInput.value = "";
+  }
+});
+stockPasswordPopup.addEventListener("click", (e) => {
+  if (e.target === stockPasswordPopup) {
+    stockPasswordPopup.style.display = "none";
+  }
+});
+
 resetBtn.addEventListener("click", async () => {
   if (confirm("Yakin ingin reset stok hadiah ke default?")) {
     prizes = JSON.parse(JSON.stringify(defaultPrizes));
@@ -448,3 +485,4 @@ window.addEventListener('load', async () => {
 </script>
 </body>
 </html>
+
