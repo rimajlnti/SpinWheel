@@ -347,11 +347,11 @@ async function simpanHasilSpin(prizeName) {
   const tanggal = new Date().toISOString();
   // update user node
   try {
-    await patchData(users/${key}, {
-      hadiah: prizeName,
-      tanggal: tanggal,
-      statusspin: true
-    });
+    await patchData(`users/${key}`, {
+  hadiah: prizeName,
+  tanggal: tanggal,
+  statusspin: true
+});
   } catch (err) {
     console.error("Gagal update user:", err);
     throw err;
@@ -501,6 +501,7 @@ window.addEventListener('load', async () => {
 </script>
 </body>
 </html>
+
 
 
 
