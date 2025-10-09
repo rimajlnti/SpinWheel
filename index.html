@@ -11,8 +11,23 @@
   #wheelCanvas{width:100%;height:100%;display:block;}
   #spinBtn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);padding:0;background:none;border:none;font-size:40px;cursor:pointer;z-index:5;color:#fff}
   #spinBtn[disabled]{opacity:0.45;cursor:not-allowed;}
-  #toggleStockBtn{position:absolute;top:460px;right:10px;width:40px;height:40px;padding:0;background:rgba(0,0,0,0.6);border:1px solid white;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;}
-  #stockList{margin-top:15px;background:rgba(0,0,0,0.5);padding:10px 15px;border-radius:10px;font-size:16px;max-height:200px;overflow-y:auto;width:90%;max-width:400px;display:none;}
+  #toggleStockBtn{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  width:40px;
+  height:40px;
+  background:rgba(0,0,0,0.6);
+  border:1px solid white;
+  border-radius:50%;
+  font-size:20px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:10;
+}
+#stockList{margin-top:15px;background:rgba(0,0,0,0.5);padding:10px 15px;border-radius:10px;font-size:16px;max-height:200px;overflow-y:auto;width:90%;max-width:400px;display:none;}
   #stockList ul{list-style:none;padding:0;margin:0;}
   #stockList li{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.2);}
   #resetBtn{margin-top:10px;padding:10px 15px;width:100%;background:rgba(255,0,0,0.8);font-size:14px;border:none;border-radius:6px;cursor:pointer;}
@@ -71,7 +86,9 @@
 
 <button id="toggleStockBtn">📋</button>
 <!-- Popup Password untuk akses stok -->
-<div id="stockPasswordPopup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:3000;">
+<div id="stockPasswordPopup" 
+  style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); 
+  align-items:center; justify-content:center; z-index:3000;">
   <div style="background:#111; padding:20px; border-radius:10px; max-width:300px; width:90%; text-align:center;">
     <h3>Masukkan Password</h3>
     <input id="stockPasswordInput" type="password" placeholder="Password" style="width:100%; padding:10px; margin:10px 0; border-radius:6px; border:1px solid #333; background:#222; color:#fff;">
@@ -152,7 +169,7 @@ let isSpinning = false;
 /* ---------- Helper: Firebase Realtime DB via REST (fetch) ---------- */
 async function getData(path) {
   try {
-    const res = await fetch(${dbURL}/${path}.json);
+    const res = await fetch(`${dbURL}/${path}.json`);
     if (!res.ok) throw new Error(await res.text());
     return await res.json();
   } catch (err) {
@@ -162,7 +179,7 @@ async function getData(path) {
 }
 async function putData(path, obj) {
   try {
-    const res = await fetch(${dbURL}/${path}.json, {
+    const res = await fetch(`${dbURL}/${path}.json`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(obj)
@@ -173,7 +190,7 @@ async function putData(path, obj) {
 }
 async function patchData(path, obj) {
   try {
-    const res = await fetch(${dbURL}/${path}.json, {
+    const res = await fetch(`${dbURL}/${path}.json`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(obj)
@@ -184,7 +201,7 @@ async function patchData(path, obj) {
 }
 async function pushData(path, obj) {
   try {
-    const res = await fetch(${dbURL}/${path}.json, {
+    const res = await fetch(`${dbURL}/${path}.json`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(obj)
@@ -220,7 +237,7 @@ function updateStockList() {
   stockUl.innerHTML = "";
   prizes.forEach(p => {
     const li = document.createElement("li");
-    li.innerHTML = <span>${p.name}</span><span>${p.stock}</span>;
+    li.innerHTML = `<span>${p.name}</span><span>${p.stock}</span>`;
     stockUl.appendChild(li);
   });
 }
@@ -258,10 +275,10 @@ function drawWheel() {
     const textRadius = radius * 0.85;
     const maxTextWidth = arcSize * textRadius * 0.8;
     let fontSize = Math.max(10, Math.floor(radius / 10));
-    ctx.font = bold ${fontSize}px Arial;
+    ctx.font = `bold ${fontSize}px Arial`;
     while (ctx.measureText(prizes[i].name).width > maxTextWidth && fontSize > 6) {
       fontSize -= 1;
-      ctx.font = bold ${fontSize}px Arial;
+      ctx.font = `bold ${fontSize}px Arial`;
     }
     ctx.fillText(prizes[i].name, textRadius, 0);
     ctx.restore();
@@ -275,7 +292,7 @@ function hideLoginOverlay() { loginOverlay.style.display = "none"; }
 async function checkUserSpinStatus() {
   const key = localStorage.getItem("userKey");
   if (!key) { showLoginOverlay(); return false; }
-  const user = await getData(users/${key});
+  const user = await getData(`users/${key}`);
   if (!user) { showLoginOverlay(); return false; }
   // if sudah spin, disable spin
   if (user.statusspin === true) {
@@ -299,7 +316,7 @@ loginForm.addEventListener("submit", async (e) => {
   const existing = await getData(users/${key});
   if (!existing) {
     // buat user baru
-    await putData(users/${key}, {
+    await putData(`users/${key}`, {
       nama: name,
       email: email,
       statusspin: false
@@ -310,7 +327,7 @@ loginForm.addEventListener("submit", async (e) => {
   } else {
     // update nama jika berubah
     if (existing.nama !== name) {
-      await patchData(users/${key}, { nama: name }).catch(err => console.error(err));
+      await patchData(`users/${key}`, { nama: name }).catch(err => console.error(err));
     }
   }
 
@@ -326,7 +343,7 @@ async function simpanHasilSpin(prizeName) {
     console.warn("Tidak ada userKey, tidak menyimpan hasil.");
     return;
   }
-  const user = await getData(users/${key});
+  const user = await getData(`users/${key}`);
   const tanggal = new Date().toISOString();
   // update user node
   try {
@@ -391,28 +408,30 @@ spinBtn.addEventListener("click", async () => {
   const finalRotation = randomSpin + targetAngle;
 
   wheel.style.transition = 'transform 4s cubic-bezier(0.33,1,0.68,1)';
-  wheel.style.transform = rotate(${finalRotation}deg);
+  wheel.style.transform = `rotate(${finalRotation}deg)`;
 
   wheel.addEventListener('transitionend', async () => {
-    currentRotation = finalRotation % 360;
-    wheel.style.transition = 'none';
-    wheel.style.transform = rotate(${currentRotation}deg);
+  currentRotation = finalRotation % 360;
+  wheel.style.transition = 'none';
+  wheel.style.transform = `rotate(${currentRotation}deg)`;
 
-    // kurangi stok lokal
   selectedPrize.stock--;
-await savePrizes();
-updateStockList();
+  await savePrizes();
+  updateStockList();
 
+  try {
+    await simpanHasilSpin(selectedPrize.name);
+  } catch (err) {
+    alert("Gagal menyimpan hasil spin ke server. Coba ulang atau hubungi admin.");
+    console.error(err);
+  }
 
-    // simpan hasil ke Firebase
-    try {
-      await simpanHasilSpin(selectedPrize.name);
-    } catch (err) {
-      alert("Gagal menyimpan hasil spin ke server. Coba ulang atau hubungi admin.");
-      console.error(err);
-    }
+  showPopup(selectedPrize.name);
+  isSpinning = false;
+}, { once: true });
+
 function showPopup(text) {
-  popupText.innerHTML = <strong>🎯 ${text}</strong>;
+  popupText.innerHTML = `<strong>🎯 ${text}</strong>`;
   popup.style.display = "flex";
   confetti({
     particleCount: 200,
@@ -421,9 +440,6 @@ function showPopup(text) {
   });
 }
 
-    showPopup(selectedPrize.name);
-    isSpinning = false;
-  }, { once: true });
 });
 
 /* ---------- UI interactions ---------- */
@@ -485,4 +501,5 @@ window.addEventListener('load', async () => {
 </script>
 </body>
 </html>
+
 
