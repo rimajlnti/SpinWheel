@@ -1,40 +1,147 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Spin Hadiah Booth</title>
 <style>
-  html,body{margin:0;padding:0;background:url('poster.png') no-repeat center center;background-size:cover;font-family:Arial,sans-serif;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;}
-  #wheelContainer{position:relative;width:84vw;max-width:400px;aspect-ratio:1/1;margin-top:calc(16vh + 50px);}
-  #wheel{width:100%;height:100%;border-radius:50%;position:relative;background:rgba(0,0,0,0.1);overflow:hidden;}
-  #wheelCanvas{width:100%;height:100%;display:block;}
-  #spinBtn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);padding:0;background:none;border:none;font-size:40px;cursor:pointer;z-index:5;color:#fff}
-  #spinBtn[disabled]{opacity:0.45;cursor:not-allowed;}
-  #toggleStockBtn{position:absolute;top:460px;right:10px;width:40px;height:40px;padding:0;background:rgba(0,0,0,0.6);border:1px solid white;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;}
-  #stockList{margin-top:15px;background:rgba(0,0,0,0.5);padding:10px 15px;border-radius:10px;font-size:16px;max-height:200px;overflow-y:auto;width:90%;max-width:400px;display:none;}
-  #stockList ul{list-style:none;padding:0;margin:0;}
-  #stockList li{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.2);}
-  #resetBtn{margin-top:10px;padding:10px 15px;width:100%;background:rgba(255,0,0,0.8);font-size:14px;border:none;border-radius:6px;cursor:pointer;}
-  #popup{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;align-items:center;justify-content:center;flex-direction:column;z-index:1000;color:white;text-align:center;}
-  #popup h1{font-size:2.2em;margin-bottom:20px;}
-  #doneBtn{padding:10px 20px;font-size:18px;background:red;color:white;border:none;border-radius:6px;cursor:pointer;}
-  /* Login overlay */
-  #loginOverlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:2000;}
-  #loginCard{background:#111;padding:18px;border-radius:10px;width:90%;max-width:360px;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,0.6);}
-  #loginCard h2{margin:0 0 12px 0;font-size:18px;text-align:center;}
-  #loginCard input{width:100%;padding:10px;margin:6px 0;border-radius:6px;border:1px solid #333;background:#222;color:#fff;}
-  #loginCard button{width:100%;padding:10px;margin-top:10px;border-radius:6px;border:none;background:#0ea5e9;color:#000;font-weight:600;cursor:pointer;}
-  #loginCard p{font-size:13px;color:#aaa;margin:8px 0 0 0;text-align:center;}
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: url('poster.png') no-repeat center center;
+    background-size: cover;
+    font-family: Arial, sans-serif;
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #wheelContainer {
+    position: relative;
+    width: 84vw;
+    max-width: 400px;
+    aspect-ratio: 1 / 1;
+    margin-top: calc(16vh + 50px);
+  }
+
+  #wheel {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    /* border: 6px solid white; */
+    position: relative;
+    background: rgba(0,0,0,0.1);
+    overflow: hidden;
+  }
+
+  #wheelCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  #spinBtn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 0;                /* hapus padding agar ikon pas */
+  background: none;          /* hilangkan background */
+  border: none;              /* hilangkan border */
+  font-size: 40px;           /* sesuaikan ukuran icon */
+  cursor: pointer;
+  z-index: 5;
+}
+#spinBtn:hover {
+  background: none;          /* jangan ada efek hover */
+}
+
+
+  #toggleStockBtn {
+  position: absolute;
+  top: 460px;       /* jarak dari atas wheelContainer */
+  right: 10px;     /* jarak dari kanan wheelContainer */
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid white;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+
+  #stockList {
+    margin-top: 15px;
+    background: rgba(0,0,0,0.5);
+    padding: 10px 15px;
+    border-radius: 10px;
+    font-size: 16px;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 90%;
+    max-width: 400px;
+    display: none;
+  }
+
+  #stockList ul { list-style: none; padding: 0; margin: 0; }
+  #stockList li {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+  }
+
+  #resetBtn {
+    margin-top: 10px;
+    padding: 10px 15px;
+    width: 100%;
+    background: rgba(255,0,0,0.8);
+    font-size: 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  #popup {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    z-index: 1000;
+    color: white;
+    text-align: center;
+  }
+
+  #popup h1 { font-size: 2.5em; margin-bottom: 20px; }
+  #doneBtn {
+    padding: 10px 20px;
+    font-size: 18px;
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
 </style>
 </head>
 <body>
 
-<!-- Wheel -->
 <div id="wheelContainer">
   <div id="wheel">
     <canvas id="wheelCanvas"></canvas>
-    <button id="spinBtn" disabled>🎯</button>
+    <button id="spinBtn">🎯</button>
   </div>
 </div>
 
@@ -45,31 +152,13 @@
   <button id="resetBtn">🔄 Reset Stok Hadiah</button>
 </div>
 
-<!-- Popup after spin -->
 <div id="popup">
   <h1 id="popupText"></h1>
   <button id="doneBtn">Selesai</button>
 </div>
 
-<!-- Login overlay (nama + email saja) -->
-<div id="loginOverlay">
-  <div id="loginCard">
-    <h2>Isi Nama & Email untuk Spin</h2>
-    <form id="loginForm">
-      <input id="nameInput" placeholder="Nama lengkap" required />
-      <input id="emailInput" type="email" placeholder="Email (contoh@domain.com)" required />
-      <button type="submit">Mulai Spin</button>
-    </form>
-    <p>Setiap email hanya dapat spin sekali.</p>
-  </div>
-</div>
-
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script>
-/* ----- KONFIG: paste DB URL project-mu di sini ----- */
-const dbURL = "https://spinwheel-8197b-default-rtdb.firebaseio.com"; // <-- sesuaikan jika beda
-
-/* ----- Hadiah ----- */
 const defaultPrizes = [
   { name: "Sticker", stock: 7 },
   { name: "Pulpen", stock: 16 },
@@ -94,65 +183,11 @@ const resetBtn = document.getElementById("resetBtn");
 const popup = document.getElementById("popup");
 const popupText = document.getElementById("popupText");
 const doneBtn = document.getElementById("doneBtn");
-const loginOverlay = document.getElementById("loginOverlay");
-const loginForm = document.getElementById("loginForm");
-const nameInput = document.getElementById("nameInput");
-const emailInput = document.getElementById("emailInput");
 
+const totalSlices = defaultPrizes.length;
 let currentRotation = 0;
 let isSpinning = false;
 
-/* ---------- Helper: Firebase Realtime DB via REST (fetch) ---------- */
-async function getData(path) {
-  try {
-    const res = await fetch(`${dbURL}/${path}.json`);
-    if (!res.ok) throw new Error(await res.text());
-    return await res.json();
-  } catch (err) {
-    console.error("GET", path, err);
-    return null;
-  }
-}
-async function putData(path, obj) {
-  try {
-    const res = await fetch(`${dbURL}/${path}.json`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(obj)
-    });
-    if (!res.ok) throw new Error(await res.text());
-    return await res.json();
-  } catch (err) { console.error("PUT", path, err); throw err; }
-}
-async function patchData(path, obj) {
-  try {
-    const res = await fetch(`${dbURL}/${path}.json`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(obj)
-    });
-    if (!res.ok) throw new Error(await res.text());
-    return await res.json();
-  } catch (err) { console.error("PATCH", path, err); throw err; }
-}
-async function pushData(path, obj) {
-  try {
-    const res = await fetch(`${dbURL}/${path}.json`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(obj)
-    });
-    if (!res.ok) throw new Error(await res.text());
-    return await res.json();
-  } catch (err) { console.error("PUSH", path, err); throw err; }
-}
-
-/* sanitize email -> key */
-function keyFromEmail(email){
-  return email.trim().toLowerCase().replace(/[@.]/g, "_");
-}
-
-/* ---------- Prizes rendering ---------- */
 function loadPrizes() {
   const saved = localStorage.getItem("spinPrizes");
   prizes = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultPrizes));
@@ -160,6 +195,55 @@ function loadPrizes() {
 function savePrizes() {
   localStorage.setItem("spinPrizes", JSON.stringify(prizes));
 }
+
+function resizeCanvas() {
+  const rect = wheel.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+  drawWheel();
+}
+
+function drawWheel() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const colors = ['#00ace6', '#0086b3', '#0099cc'];
+  const radius = canvas.width / 2;
+  const arcSize = (2 * Math.PI) / totalSlices;
+
+  for (let i = 0; i < totalSlices; i++) {
+    const angle = i * arcSize;
+    ctx.fillStyle = colors[i % 3];
+    ctx.beginPath();
+    ctx.moveTo(radius, radius);
+    ctx.arc(radius, radius, radius, angle, angle + arcSize);
+    ctx.closePath();
+    ctx.fill();
+
+    // gambar teks
+    ctx.save();
+    ctx.translate(radius, radius);
+    ctx.rotate(angle + arcSize / 2);
+    ctx.fillStyle = "white";
+    ctx.textAlign = "right";
+
+    // lebar maksimal teks: 80% dari panjang arc di radius
+    const textRadius = radius * 0.85; 
+    const maxTextWidth = arcSize * textRadius * 0.8; // 0.8 supaya ada margin
+
+    // mulai dengan font default
+    let fontSize = radius / 10; 
+    ctx.font = `bold ${fontSize}px Arial`;
+
+    // sesuaikan font jika teks terlalu panjang
+    while (ctx.measureText(prizes[i].name).width > maxTextWidth && fontSize > 6) {
+      fontSize -= 1;
+      ctx.font = `bold ${fontSize}px Arial`;
+    }
+
+    ctx.fillText(prizes[i].name, textRadius, 0);
+    ctx.restore();
+  }
+}
+
 function updateStockList() {
   stockUl.innerHTML = "";
   prizes.forEach(p => {
@@ -169,152 +253,26 @@ function updateStockList() {
   });
 }
 
-/* ---------- Canvas wheel ---------- */
-function resizeCanvas() {
-  const rect = wheel.getBoundingClientRect();
-  canvas.width = rect.width;
-  canvas.height = rect.height;
-  drawWheel();
-}
-function drawWheel() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  if (!prizes || prizes.length === 0) return;
-  const colors = ['#00ace6','#0086b3','#0099cc'];
-  const radius = canvas.width / 2;
-  const totalSlices = prizes.length;
-  const arcSize = (2 * Math.PI) / totalSlices;
-
-  for (let i = 0; i < totalSlices; i++) {
-    const angle = i * arcSize;
-    ctx.fillStyle = colors[i % colors.length];
-    ctx.beginPath();
-    ctx.moveTo(radius, radius);
-    ctx.arc(radius, radius, radius, angle, angle + arcSize);
-    ctx.closePath();
-    ctx.fill();
-
-    ctx.save();
-    ctx.translate(radius, radius);
-    ctx.rotate(angle + arcSize / 2);
-    ctx.fillStyle = "white";
-    ctx.textAlign = "right";
-
-    const textRadius = radius * 0.85;
-    const maxTextWidth = arcSize * textRadius * 0.8;
-    let fontSize = Math.max(10, Math.floor(radius / 10));
-    ctx.font = `bold ${fontSize}px Arial`;
-    while (ctx.measureText(prizes[i].name).width > maxTextWidth && fontSize > 6) {
-      fontSize -= 1;
-      ctx.font = `bold ${fontSize}px Arial`;
-    }
-    ctx.fillText(prizes[i].name, textRadius, 0);
-    ctx.restore();
-  }
-}
-
-/* ---------- Login flow (no password) ---------- */
-function showLoginOverlay() { loginOverlay.style.display = "flex"; spinBtn.disabled = true; }
-function hideLoginOverlay() { loginOverlay.style.display = "none"; }
-
-async function checkUserSpinStatus() {
-  const key = localStorage.getItem("userKey");
-  if (!key) { showLoginOverlay(); return false; }
-  const user = await getData(`users/${key}`);
-  if (!user) { showLoginOverlay(); return false; }
-  // if sudah spin, disable spin
-  if (user.statusspin === true) {
-    spinBtn.disabled = true;
-    alert("Anda sudah melakukan spin sebelumnya. Terima kasih.");
-    return false;
-  }
-  // allow spin
-  spinBtn.disabled = false;
-  return true;
-}
-
-loginForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const name = nameInput.value.trim();
-  const email = emailInput.value.trim();
-  if (!name || !email) return alert("Isi nama dan email dengan benar.");
-  const key = keyFromEmail(email);
-
-  // baca data user jika ada
-  const existing = await getData(`users/${key}`);
-  if (!existing) {
-    // buat user baru
-    await putData(`users/${key}`, {
-      nama: name,
-      email: email,
-      statusspin: false
-    }).catch(err => {
-      alert("Gagal menyimpan user. Periksa aturan database.");
-      console.error(err);
-    });
-  } else {
-    // update nama jika berubah
-    if (existing.nama !== name) {
-      await patchData(`users/${key}`, { nama: name }).catch(err => console.error(err));
-    }
-  }
-
-  localStorage.setItem("userKey", key);
-  hideLoginOverlay();
-  await checkUserSpinStatus();
-});
-
-/* ---------- Simpan hasil spin ke Firebase ---------- */
-async function simpanHasilSpin(prizeName) {
-  const key = localStorage.getItem("userKey");
-  if (!key) {
-    console.warn("Tidak ada userKey, tidak menyimpan hasil.");
-    return;
-  }
-  const user = await getData(`users/${key}`);
-  const tanggal = new Date().toISOString();
-  // update user node
-  try {
-    await patchData(`users/${key}`, {
-      hadiah: prizeName,
-      tanggal: tanggal,
-      statusspin: true
-    });
-  } catch (err) {
-    console.error("Gagal update user:", err);
-    throw err;
-  }
-  // push ke history 'spins'
-  try {
-    await pushData('spins', {
-      userKey: key,
-      nama: user?.nama || key,
-      email: user?.email || null,
-      hadiah: prizeName,
-      tanggal: tanggal
-    });
-  } catch (err) {
-    console.error("Gagal push history spins:", err);
-  }
-}
-
-/* ---------- Wheel spin logic ---------- */
 function pickPrize() {
-  const totalStock = prizes.reduce((sum,p)=>sum + (p.stock||0), 0);
-  if (totalStock <= 0) return null;
+  let totalStock = prizes.reduce((sum, p) => sum + p.stock, 0);
   let r = Math.random() * totalStock;
   let acc = 0;
   for (let p of prizes) {
     acc += p.stock;
     if (r <= acc) return p;
   }
-  return null;
 }
 
-spinBtn.addEventListener("click", async () => {
+function showPopup(prize) {
+  popupText.textContent = `🎉 Selamat Kamu dapat: ${prize}`;
+  popup.style.display = "flex";
+  confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
+}
+
+doneBtn.addEventListener("click", () => popup.style.display = "none");
+
+spinBtn.addEventListener("click", () => {
   if (isSpinning) return;
-  // ensure user allowed
-  const ok = await checkUserSpinStatus();
-  if (!ok) return;
   const available = prizes.filter(p => p.stock > 0);
   if (available.length === 0) {
     showPopup("🎁 Stok hadiah sudah habis!");
@@ -328,46 +286,36 @@ spinBtn.addEventListener("click", async () => {
   }
 
   const prizeIndex = prizes.indexOf(selectedPrize);
-  const totalSlices = prizes.length;
   const sliceAngle = 360 / totalSlices;
-  const randomSpin = 360 * (5 + Math.floor(Math.random()*3)); // 5-7 putaran
+  const randomSpin = 360 * 5; 
   const targetAngle = 90 - (prizeIndex * sliceAngle + sliceAngle / 2);
   const finalRotation = randomSpin + targetAngle;
 
-  wheel.style.transition = 'transform 4s cubic-bezier(0.33,1,0.68,1)';
+  wheel.style.transition = 'transform 4s cubic-bezier(0.33, 1, 0.68, 1)';
   wheel.style.transform = `rotate(${finalRotation}deg)`;
 
-  wheel.addEventListener('transitionend', async () => {
+  wheel.addEventListener('transitionend', () => {
     currentRotation = finalRotation % 360;
     wheel.style.transition = 'none';
     wheel.style.transform = `rotate(${currentRotation}deg)`;
-
-    // kurangi stok lokal
     selectedPrize.stock--;
     savePrizes();
     updateStockList();
-
-    // simpan hasil ke Firebase
-    try {
-      await simpanHasilSpin(selectedPrize.name);
-    } catch (err) {
-      alert("Gagal menyimpan hasil spin ke server. Coba ulang atau hubungi admin.");
-      console.error(err);
-    }
-
     showPopup(selectedPrize.name);
     isSpinning = false;
   }, { once: true });
 });
 
-/* ---------- UI interactions ---------- */
 toggleStockBtn.addEventListener("click", () => {
-  if (stockList.style.display === "none" || stockList.style.display === "") {
+  if (stockList.style.display === "none") {
     stockList.style.display = "block";
+    toggleStockBtn.textContent = "📋";
   } else {
     stockList.style.display = "none";
+    toggleStockBtn.textContent = "📋";
   }
 });
+
 resetBtn.addEventListener("click", () => {
   if (confirm("Yakin ingin reset stok hadiah ke default?")) {
     prizes = JSON.parse(JSON.stringify(defaultPrizes));
@@ -376,22 +324,13 @@ resetBtn.addEventListener("click", () => {
     updateStockList();
   }
 });
-doneBtn.addEventListener("click", () => { popup.style.display = "none"; });
 
-/* ---------- Init ---------- */
 window.addEventListener('resize', resizeCanvas);
-window.addEventListener('load', async () => {
-  loadPrizes();
-  resizeCanvas();
-  updateStockList();
-  // jika sudah login di localStorage, cek status
-  if (!localStorage.getItem("userKey")) {
-    showLoginOverlay();
-  } else {
-    hideLoginOverlay();
-    await checkUserSpinStatus();
-  }
-});
+
+loadPrizes();
+resizeCanvas();
+updateStockList();
 </script>
 </body>
 </html>
+
