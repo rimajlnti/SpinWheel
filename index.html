@@ -187,13 +187,22 @@ function keyFromEmail(email){
 }
 
 /* ---------- Prizes rendering ---------- */
-function loadPrizes() {
-  const saved = localStorage.getItem("spinPrizes");
-  prizes = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultPrizes));
+async function loadPrizes() {
+  const data = await getData("stokHadiah");
+  if (data) {
+    prizes = data;
+  } else {
+    prizes = JSON.parse(JSON.stringify(defaultPrizes));
+    await savePrizes(); // inisialisasi stok pertama kali
+  }
+  drawWheel();
+  updateStockList();
 }
-function savePrizes() {
-  localStorage.setItem("spinPrizes", JSON.stringify(prizes));
+
+async function savePrizes() {
+  await putData("stokHadiah", prizes);
 }
+
 function updateStockList() {
   stockUl.innerHTML = "";
   prizes.forEach(p => {
@@ -377,9 +386,10 @@ spinBtn.addEventListener("click", async () => {
     wheel.style.transform = `rotate(${currentRotation}deg)`;
 
     // kurangi stok lokal
-    selectedPrize.stock--;
-    savePrizes();
-    updateStockList();
+  selectedPrize.stock--;
+await savePrizes();
+updateStockList();
+
 
     // simpan hasil ke Firebase
     try {
@@ -389,7 +399,7 @@ spinBtn.addEventListener("click", async () => {
       console.error(err);
     }
 function showPopup(text) {
-  popupText.innerHTML = `<strong>🎯Selamat Kamu Dapet : ${text}</strong>`;
+  popupText.innerHTML = `<strong>🎯 ${text}</strong>`;
   popup.style.display = "flex";
   confetti({
     particleCount: 200,
@@ -411,10 +421,10 @@ toggleStockBtn.addEventListener("click", () => {
     stockList.style.display = "none";
   }
 });
-resetBtn.addEventListener("click", () => {
+resetBtn.addEventListener("click", async () => {
   if (confirm("Yakin ingin reset stok hadiah ke default?")) {
     prizes = JSON.parse(JSON.stringify(defaultPrizes));
-    savePrizes();
+    await savePrizes();
     drawWheel();
     updateStockList();
   }
@@ -424,10 +434,9 @@ doneBtn.addEventListener("click", () => { popup.style.display = "none"; });
 /* ---------- Init ---------- */
 window.addEventListener('resize', resizeCanvas);
 window.addEventListener('load', async () => {
-  loadPrizes();
+  await loadPrizes();   // pakai async karena sekarang ambil dari server
   resizeCanvas();
   updateStockList();
-  // jika sudah login di localStorage, cek status
   if (!localStorage.getItem("userKey")) {
     showLoginOverlay();
   } else {
@@ -435,7 +444,7 @@ window.addEventListener('load', async () => {
     await checkUserSpinStatus();
   }
 });
+
 </script>
 </body>
 </html> 
-
